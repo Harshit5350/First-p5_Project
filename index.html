@@ -1,0 +1,136 @@
+<html>
+<head>
+    <title> First p5 project </title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/p5.js"></script>
+    <script src="https://unpkg.com/ml5@0.4.3/dist/ml5.min.js"></script>
+</head>
+
+<body background="background.jpg">
+    <div class="container flex jd">
+        <center>
+            <h1 class="btn-lg btn btn-success well" type="label"> First p5.js Project </h1>
+            <br>
+            <label class="btn-primary ok" tyoe="">
+                <p>Use Your Nose to Move the Circles </p>
+                <p>Use your wrists to adjust the size of the rectangle</p>
+            </label>
+            <br><br>
+            <hr>
+        </center>
+    </div>
+</body>
+</html>
+
+<style>
+    .flex{
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .jd::after{
+        content: "";
+        clear: both;
+    }
+
+    .well{
+        padding-left: 30px;
+        padding-right: 30px;
+        padding-top: 4px;
+        padding-bottom: 4px;
+        background-color: #3a9c3b;
+        border-radius: 7px;
+        border-width: 1px;
+        border-color: black;
+    }
+    
+    .ok{
+        padding-left: 30px;
+        padding-right: 30px;
+        padding-top: 4px;
+        padding-bottom: 4px;
+    }
+
+    hr{
+        transform: rotate(90deg);
+        border-color: black;
+        width: 580px;
+        margin-top: 300px;
+        border-width: 2px;
+    }
+
+    canvas{
+        border-width: 5px;
+        border-color: black;
+        background-color: grey;
+    }
+
+    .video-class{
+        border: 5px dashed black;
+        overflow:hidden;
+    }
+</style>
+
+<script>
+    let noseX = 0;
+    let noseY = 0;
+    let lw = 0;
+    let rw = 0;
+    let difference = 0;
+
+    function setup(){
+        video = createCapture(VIDEO);
+        video.size(680, 500);
+        video.position(35,200);
+       //canvas.style('border', '5px solid black');  i can style it in java script too withoutt the help of css
+        video.class('video-class');
+
+        canvas = createCanvas(610, 510);
+        canvas.position(900,200);
+        canvas.style('border', '5px solid black'); // Adding border to the canvas
+
+        poseNet = ml5.poseNet(video, modelReady);
+        poseNet.on('pose', gotPoses);
+    }
+
+    function modelReady() {
+        console.log('Model Loaded!');
+    }
+
+    function gotPoses(results){
+        if(results.length > 0){
+            console.log(results)
+            noseX = results[0].pose.nose.x;
+            noseY = results[0].pose.nose.y;
+
+            lw = results[0].pose.leftWrist.x;
+            rw = results[0].pose.rightWrist.x;
+            difference = floor(lw - rw);
+        }
+    }
+
+    function draw(){
+        background('grey');
+
+        // Drawing the circle
+        fill('#F90093');
+        stroke('#F90093');
+        circle(noseX, noseY, 50);
+
+        // Drawing the square
+        fill('green');
+        stroke('green');
+        square(50, 70, difference);
+
+        // Drawing the ellipse
+        fill('blue');
+        stroke('blue');
+        ellipse(100, 250, 80, 40);
+    }
+</script>
